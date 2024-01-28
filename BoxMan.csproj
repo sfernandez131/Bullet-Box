@@ -5,6 +5,9 @@
 		<RollForward>Major</RollForward>
 		<PublishReadyToRun>false</PublishReadyToRun>
 		<TieredCompilation>false</TieredCompilation>
+		<Authors>Scott Fernandez</Authors>
+		<Company>Outpost 13, LLC</Company>
+		<AssemblyName>Bullet Box</AssemblyName>
 		<PublishAot>false</PublishAot>
 	</PropertyGroup>
 	<PropertyGroup>

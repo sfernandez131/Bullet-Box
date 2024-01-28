@@ -31,18 +31,6 @@
 /processorParam:Quality=Best
 /build:Audio/backGround.mp3
 
-#begin Audio/backGround.mp3
-/importer:Mp3Importer
-/processor:SongProcessor
-/processorParam:Quality=Best
-/build:Audio/backGround.mp3
-
-#begin Audio/bullet.mp3
-/importer:Mp3Importer
-/processor:SoundEffectProcessor
-/processorParam:Quality=Best
-/build:Audio/bullet.mp3
-
 #begin Audio/bullet.mp3
 /importer:Mp3Importer
 /processor:SongProcessor

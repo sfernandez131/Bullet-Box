@@ -74,6 +74,8 @@ namespace BoxMan
             _graphics.PreferredBackBufferHeight = 1080;
             _graphics.ApplyChanges();
 
+            Window.Title = "Bullet Box";
+
             Content.RootDirectory = "Content";
             //IsMouseVisible = true;
         }
@@ -614,7 +616,7 @@ namespace BoxMan
                 _spriteBatch.DrawString(font, textToDisplay2, textPosition2, Color.White);
 
 
-                string GameTitleText = "=============\n       Box Man\n=============\n\n\n\n\n\n";
+                string GameTitleText = "=============\n       Bullet Box\n=============\n\n\n\n\n\n";
                 Vector2 textSize1 = font.MeasureString(GameTitleText);
                 Vector2 textPosition1 = new Vector2(
                     (_graphics.PreferredBackBufferWidth - textSize1.X) / 2, // Center horizontally
