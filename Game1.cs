@@ -82,7 +82,7 @@ namespace BoxMan
 
             // Play the background music on loop
             MediaPlayer.IsRepeating = true;
-            //MediaPlayer.Play(backgroundMusic);
+            MediaPlayer.Play(backgroundMusic);
 
             PlayerPosition = new(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
 
