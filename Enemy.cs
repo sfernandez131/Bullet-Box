@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using System.Collections.Generic;
 using System;
+using Microsoft.Xna.Framework.Audio;
 
 namespace BoxMan
 {
@@ -10,6 +11,7 @@ namespace BoxMan
         private Random random = new Random();
         public Vector2 Position { get; set; }
         public Texture2D Texture { get; private set; }
+        private SoundEffect BulletFired;
         public float ShootInterval { get; private set; }
         public float TimeSinceLastShot { get; set; }
         public float MovementSpeed { get; private set; } = 2f; // Adjust speed as needed
@@ -25,12 +27,13 @@ namespace BoxMan
             }
         }
 
-        public Enemy(Texture2D texture, Vector2 position, float shootInterval)
+        public Enemy(Texture2D texture, Vector2 position, float shootInterval, SoundEffect _bulletFired)
         {
             Texture = texture;
             Position = position;
             ShootInterval = shootInterval;
             TimeSinceLastShot = 0;
+            BulletFired = _bulletFired;
 
             // Initialize random movement direction
             ChangeDirection();
@@ -113,15 +116,15 @@ namespace BoxMan
             Vector2 projectileVelocity = direction * projectileSpeed;
 
             // Create and add the projectile
-            Projectile enemyProjectile = new Projectile(Position, projectileVelocity, projectileTexture); // Use an appropriate texture for the enemy projectile
+            Projectile enemyProjectile = new Projectile(Position, projectileVelocity, projectileTexture, this); // Use an appropriate texture for the enemy projectile
             enemyProjectiles.Add(enemyProjectile); // Assuming mainProjectiles is a list that handles all projectiles in the game
-        }
 
+            BulletFired.Play();
+        }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(Texture, Position, Color.Red); // Draw the enemy as a red square
         }
     }
-
 }

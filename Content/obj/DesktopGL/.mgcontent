@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SourceFileCollection xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Profile>Reach</Profile>
+  <Platform>DesktopGL</Platform>
+  <Config />
+  <SourceFiles>
+    <File>D:/source/BoxMan/Content/Audio/9mm-pistol-shoot.mp3</File>
+    <File>D:/source/BoxMan/Content/Audio/9mm-pistol-shot-Enemy.mp3</File>
+    <File>D:/source/BoxMan/Content/Audio/backGround.mp3</File>
+    <File>D:/source/BoxMan/Content/Audio/bullet.mp3</File>
+    <File>D:/source/BoxMan/Content/Audio/retro-wave-style-track.mp3</File>
+    <File>D:/source/BoxMan/Content/Fonts/pixelText.spritefont</File>
+    <File>D:/source/BoxMan/Content/Sprites/Bomb.png</File>
+    <File>D:/source/BoxMan/Content/Sprites/Enemy.png</File>
+    <File>D:/source/BoxMan/Content/Sprites/Player.png</File>
+  </SourceFiles>
+  <DestFiles>
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+    <File xsi:nil="true" />
+  </DestFiles>
+</SourceFileCollection>

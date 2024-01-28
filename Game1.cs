@@ -20,7 +20,7 @@ namespace BoxMan
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private Random random = new Random();
-        private GameState gameState = GameState.Playing;
+        private GameState gameState = GameState.GameOver;
 
         // Fonts
         SpriteFont font;
@@ -28,6 +28,8 @@ namespace BoxMan
         // Audio
         private Song backgroundMusic;
         private SoundEffect BulletFired;
+        private SoundEffect EnemyBulletFired;
+        private SoundEffect BombExplosion;
 
         // Projectile data
         private List<Projectile> mainProjectiles = new List<Projectile>();
@@ -56,6 +58,14 @@ namespace BoxMan
         private int EnemyCount = 1;
         private int KillCount = 0;
 
+        // Bombs
+        // In Game1 class
+        private Bomb playerBomb;
+        private Texture2D bombTexture;
+        private bool bombDropped = false;
+        private const float bombDuration = 2f; // Bomb lasts for 2 seconds
+
+
         public Game1()
         {
             _graphics = new GraphicsDeviceManager(this);
@@ -65,7 +75,7 @@ namespace BoxMan
             _graphics.ApplyChanges();
 
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            //IsMouseVisible = true;
         }
 
         protected override void Initialize()
@@ -77,8 +87,9 @@ namespace BoxMan
             IsFixedTimeStep = false;
 
             // Load the audio
-            backgroundMusic = Content.Load<Song>("Audio/backGround");
-            BulletFired = Content.Load<SoundEffect>("Audio/bullet");
+            backgroundMusic = Content.Load<Song>("Audio/retro-wave-style-track");
+            BulletFired = Content.Load<SoundEffect>("Audio/9mm-pistol-shoot");
+            EnemyBulletFired = Content.Load<SoundEffect>("Audio/9mm-pistol-shot-Enemy");
 
             // Play the background music on loop
             MediaPlayer.IsRepeating = true;
@@ -102,6 +113,8 @@ namespace BoxMan
 
             // Load enemy texture and create enemies
             enemyTexture = Content.Load<Texture2D>("Sprites/Enemy");
+            bombTexture = Content.Load<Texture2D>("Sprites/Bomb");
+
             CreateEnemies();
         }
 
@@ -110,7 +123,7 @@ namespace BoxMan
             for (int i = 0; i < EnemyCount; i++)
             {
                 // Create a few enemies at different positions
-                enemies.Add(new Enemy(enemyTexture, new Vector2(100, 100), 2f)); // Shoot every 2 seconds
+                enemies.Add(new Enemy(enemyTexture, new Vector2(random.Next(1911), random.Next(1061)), (float)(random.NextDouble() * (1.5 - 2) + 1), EnemyBulletFired)); // Shoot at random speeds up to 3 seconds
             }
         }
 
@@ -165,12 +178,12 @@ namespace BoxMan
         private void RestartGame()
         {
             gameState = GameState.Playing;
-            //PlayerSprite = Content.Load<Texture2D>("Sprites/Player");
             PlayerPosition = new Vector2(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
             mainProjectiles.Clear();
             enemyProjectiles.Clear();
             explosionDots.Clear();
             enemies.Clear();
+            bombDropped = false;
             EnemyCount = 1;
             KillCount = 0;
             CreateEnemies();
@@ -196,7 +209,7 @@ namespace BoxMan
             }
 
             // TODO: Add your update logic here
-            await PlayerMovementV2();
+            await PlayerMovementV2(gameTime);
 
             // Update enemies
             foreach (var enemy in enemies)
@@ -244,6 +257,20 @@ namespace BoxMan
                     projectile.Position.Y < 0 || projectile.Position.Y > _graphics.PreferredBackBufferHeight - projectile.Texture.Height)
                 {
                     enemyProjectiles.RemoveAt(i);
+                    continue;
+                }
+
+                // Check for collision with other enemies
+                for (int j = enemies.Count - 1; j >= 0; j--)
+                {
+                    var enemy = enemies[j];
+                    if (projectile.Bounds.Intersects(enemy.Bounds) && projectile.Owner != enemy)
+                    {
+                        TriggerExplosion(enemy.Position);
+                        enemyProjectiles.RemoveAt(i);
+                        enemies.RemoveAt(j);
+                        break; // Break out of the inner loop since the projectile is already removed
+                    }
                 }
             }
 
@@ -281,6 +308,7 @@ namespace BoxMan
                 }
             }
 
+
             // Remove enemies that were hit
             foreach (var enemy in enemiesToRemove)
             {
@@ -292,26 +320,48 @@ namespace BoxMan
                 EnemyCount++;
                 CreateEnemies();
             }
-            
+
+            // Check for collisions between the player and enemies
+            Rectangle playerBounds = new Rectangle((int)PlayerPosition.X, (int)PlayerPosition.Y, PlayerSprite.Width, PlayerSprite.Height);
+            foreach (var enemy in enemies)
+            {
+                Rectangle enemyBounds = new Rectangle((int)enemy.Position.X, (int)enemy.Position.Y, enemy.Texture.Width, enemy.Texture.Height);
+                if (playerBounds.Intersects(enemyBounds))
+                {
+                    // Collision detected, trigger game over
+                    TriggerExplosion(PlayerPosition); // Optional: Explosion effect at player's position
+                    gameState = GameState.GameOver;
+                    break; // Exit the loop since the game is over
+                }
+            }
+
 
             // Check for collisions between enemy bullets and the player
             foreach (var projectile in enemyProjectiles)
             {
-                Rectangle playerBounds = new Rectangle((int)PlayerPosition.X, (int)PlayerPosition.Y, PlayerSprite.Width, PlayerSprite.Height);
+                playerBounds = new Rectangle((int)PlayerPosition.X, (int)PlayerPosition.Y, PlayerSprite.Width, PlayerSprite.Height);
                 if (projectile.Bounds.Intersects(playerBounds)) // Assuming PlayerBounds is a property for player collision detection
                 {
-                    //PlayerSprite.Dispose();
-
                     TriggerExplosion(PlayerPosition); // Explosion effect at player's position
 
                     gameState = GameState.GameOver;
-
-                    //Exit(); // End the game
-                    //return; // Exit the method
                 }
             }
 
             base.Update(gameTime);
+        }
+
+        private void ExplodeBomb(Vector2 position)
+        {
+            int numberOfProjectiles = 360; // One projectile per degree
+            for (int i = 0; i < numberOfProjectiles; i++)
+            {
+                float angle = MathHelper.ToRadians(i);
+                Vector2 velocity = new Vector2((float)Math.Cos(angle), (float)Math.Sin(angle)) * 10f; // Adjust speed as needed
+
+                Projectile explosionProjectile = new Projectile(position, velocity, projectileTexture, this);
+                mainProjectiles.Add(explosionProjectile);
+            }
         }
 
         private void TriggerExplosion(Vector2 position)
@@ -326,28 +376,32 @@ namespace BoxMan
             }
         }
 
-        private async Task PlayerMovementV2()
+        private async Task PlayerMovementV2(GameTime gameTime)
         {
             // Get the current state of the gamepad, keyboard, and mouse
             GamePadState gamePadState = GamePad.GetState(PlayerIndex.One, GamePadDeadZone.Circular);
             if (gamePadState.IsConnected)
             {
+                IsMouseVisible = false;
+
                 if (gamePadState.Buttons.Back == ButtonState.Pressed)
                     Exit();
 
-                HandleGamepadInput(gamePadState);
+                HandleGamepadInput(gamePadState, gameTime);
 
                 previousGamepadState = gamePadState;
             }
             else
             {
+                IsMouseVisible = true;
+
                 MouseState mouseState = Mouse.GetState();
                 KeyboardState keyboardState = Keyboard.GetState();
 
                 if (keyboardState.IsKeyDown(Keys.Escape))
                     Exit();
 
-                await HandleKeyboardAndMouseInput(keyboardState, mouseState);
+                await HandleKeyboardAndMouseInput(keyboardState, mouseState, gameTime);
 
                 previousKeyboardState = keyboardState;
             }
@@ -359,13 +413,13 @@ namespace BoxMan
             Vector2 projectileVelocity = Vector2.Normalize(direction) * 15f; // Adjust speed as needed
 
             // Create and add the projectile
-            Projectile newProjectile = new Projectile(new(PlayerPosition.X, PlayerPosition.Y), projectileVelocity, projectileTexture);
+            Projectile newProjectile = new Projectile(new(PlayerPosition.X, PlayerPosition.Y), projectileVelocity, projectileTexture, this);
             mainProjectiles.Add(newProjectile);
 
             BulletFired.Play();
         }
 
-        private void HandleGamepadInput(GamePadState gamePadState)
+        private void HandleGamepadInput(GamePadState gamePadState, GameTime gameTime)
         {
             testState = gamePadState;
             // Use left thumbstick for movement
@@ -411,9 +465,25 @@ namespace BoxMan
                                                           (float)Math.Sin(rotationAngle - MathHelper.PiOver2));
                 FireProjectile(projectileDirection);
             }
+
+            if ((gamePadState.Buttons.LeftShoulder == ButtonState.Pressed && previousGamepadState.Buttons.LeftShoulder == ButtonState.Released) && !bombDropped)
+            {
+                playerBomb = new Bomb(PlayerPosition, bombTexture, bombDuration);
+                bombDropped = true;
+            }
+
+            if (bombDropped)
+            {
+                playerBomb.Update(gameTime);
+                if (playerBomb.Timer <= 0)
+                {
+                    bombDropped = false;
+                    ExplodeBomb(playerBomb.Position);
+                }
+            }
         }
 
-        private async Task HandleKeyboardAndMouseInput(KeyboardState keyboardState, MouseState mouseState)
+        private async Task HandleKeyboardAndMouseInput(KeyboardState keyboardState, MouseState mouseState, GameTime gameTime)
         {
             // Get input for movement
             Vector2 inputDirection = Vector2.Zero;
@@ -449,6 +519,22 @@ namespace BoxMan
                 FireProjectile(projectileDirection);
             }
             previousMouseState = mouseState;
+
+            if (Keyboard.GetState().IsKeyDown(Keys.B) && !bombDropped)
+            {
+                playerBomb = new Bomb(PlayerPosition, bombTexture, bombDuration);
+                bombDropped = true;
+            }
+
+            if (bombDropped)
+            {
+                playerBomb.Update(gameTime);
+                if (playerBomb.Timer <= 0)
+                {
+                    bombDropped = false;
+                    ExplodeBomb(playerBomb.Position);
+                }
+            }
         }
 
         protected override void Draw(GameTime gameTime)
@@ -485,6 +571,11 @@ namespace BoxMan
                     enemy.Draw(_spriteBatch);
                 }
 
+                if (bombDropped)
+                {
+                    playerBomb.Draw(_spriteBatch);
+                }
+
                 // Draw the sprite with rotation
                 _spriteBatch.Draw(PlayerSprite, PlayerPosition, null, Color.White, rotationAngle, spriteOrigin, 1f, SpriteEffects.None, 0f);
 
@@ -513,13 +604,31 @@ namespace BoxMan
             }
             else if (gameState == GameState.GameOver)
             {
-                string gameOverText = "Game Over\nPress Enter or Start to Restart\nPress Select or Esc to End";
-                Vector2 textSize = font.MeasureString(gameOverText);
-                Vector2 textPosition = new Vector2(
-                    (_graphics.PreferredBackBufferWidth - textSize.X) / 2, // Center horizontally
-                    (_graphics.PreferredBackBufferHeight - textSize.Y) / 2 // Center vertically
+                string textToDisplay = "Enemies Defeated: " + KillCount; // Replace with the actual value or variable you want to display
+                Vector2 textSize = font.MeasureString(textToDisplay);
+                Vector2 textPosition = new Vector2(GraphicsDevice.Viewport.Width - textSize.X - 50, 10); // 10-pixel padding from right and top edges
+                _spriteBatch.DrawString(font, textToDisplay, textPosition, Color.White);
+
+                string textToDisplay2 = $"Enemy Count: {enemies.Count}"; // Replace with the actual value or variable you want to display
+                Vector2 textPosition2 = new Vector2(GraphicsDevice.Viewport.Width - textSize.X - 50, 40); // 10-pixel padding from right and top edges
+                _spriteBatch.DrawString(font, textToDisplay2, textPosition2, Color.White);
+
+
+                string GameTitleText = "=============\n       Box Man\n=============\n\n\n\n\n\n";
+                Vector2 textSize1 = font.MeasureString(GameTitleText);
+                Vector2 textPosition1 = new Vector2(
+                    (_graphics.PreferredBackBufferWidth - textSize1.X) / 2, // Center horizontally
+                    (_graphics.PreferredBackBufferHeight - textSize1.Y) / 2 // Center vertically
                 );
-                _spriteBatch.DrawString(font, gameOverText, textPosition, Color.White);
+                _spriteBatch.DrawString(font, GameTitleText, textPosition1, Color.Green);
+
+                string gameOverText = "Press Enter or Start to Play\nPress Select or Esc to End";
+                Vector2 textSize3 = font.MeasureString(gameOverText);
+                Vector2 textPosition3 = new Vector2(
+                    (_graphics.PreferredBackBufferWidth - textSize3.X) / 2, // Center horizontally
+                    (_graphics.PreferredBackBufferHeight - textSize3.Y) / 2 // Center vertically
+                );
+                _spriteBatch.DrawString(font, gameOverText, textPosition3, Color.White);
             }
 
             _spriteBatch.End();

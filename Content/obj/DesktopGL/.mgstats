@@ -1,0 +1,10 @@
+Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"D:/source/BoxMan/Content/Audio/9mm-pistol-shoot.mp3","D:/source/BoxMan/Content/bin/DesktopGL/Audio/9mm-pistol-shoot.xnb","SoundEffectProcessor","SoundEffectContent",47647,131433,0.4844314
+"D:/source/BoxMan/Content/Audio/9mm-pistol-shot-Enemy.mp3","D:/source/BoxMan/Content/bin/DesktopGL/Audio/9mm-pistol-shot-Enemy.xnb","SoundEffectProcessor","SoundEffectContent",54334,149865,0.2693552
+"D:/source/BoxMan/Content/Audio/backGround.mp3","D:/source/BoxMan/Content/bin/DesktopGL/Audio/backGround.xnb","SongProcessor","SongContent",1396819,128,1.0811273
+"D:/source/BoxMan/Content/Audio/bullet.mp3","D:/source/BoxMan/Content/bin/DesktopGL/Audio/bullet.xnb","SongProcessor","SongContent",15046,124,0.2607709
+"D:/source/BoxMan/Content/Audio/retro-wave-style-track.mp3","D:/source/BoxMan/Content/bin/DesktopGL/Audio/retro-wave-style-track.xnb","SongProcessor","SongContent",2948640,140,2.3856063
+"D:/source/BoxMan/Content/Fonts/pixelText.spritefont","D:/source/BoxMan/Content/bin/DesktopGL/Fonts/pixelText.xnb","FontDescriptionProcessor","SpriteFontContent",2068,37919,0.2066269
+"D:/source/BoxMan/Content/Sprites/Bomb.png","D:/source/BoxMan/Content/bin/DesktopGL/Sprites/Bomb.xnb","TextureProcessor","Texture2DContent",231,6485,0.2573885
+"D:/source/BoxMan/Content/Sprites/Enemy.png","D:/source/BoxMan/Content/bin/DesktopGL/Sprites/Enemy.xnb","TextureProcessor","Texture2DContent",279,6485,0.1145666
+"D:/source/BoxMan/Content/Sprites/Player.png","D:/source/BoxMan/Content/bin/DesktopGL/Sprites/Player.xnb","TextureProcessor","Texture2DContent",284,6485,0.0373581

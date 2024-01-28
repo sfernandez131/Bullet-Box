@@ -11,6 +11,9 @@ namespace BoxMan
         public float Lifespan; // Lifespan in seconds
         public bool IsExpired => Lifespan <= 0;
 
+        // Add an Owner property
+        public object Owner { get; private set; }
+
         // Property to get the bounding rectangle of the projectile
         public Rectangle Bounds
         {
@@ -20,12 +23,14 @@ namespace BoxMan
             }
         }
 
-        public Projectile(Vector2 position, Vector2 velocity, Texture2D texture, float lifespan = float.MaxValue)
+        // Modify the constructor to accept the owner of the projectile
+        public Projectile(Vector2 position, Vector2 velocity, Texture2D texture, object owner)
         {
             Position = position;
             Velocity = velocity;
             Texture = texture;
-            Lifespan = lifespan;
+            Owner = owner;
+            Lifespan = 1f;
         }
 
         public void Update(GameTime gameTime)
@@ -39,5 +44,4 @@ namespace BoxMan
             spriteBatch.Draw(Texture, Position, Color.White);
         }
     }
-
 }
