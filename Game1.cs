@@ -515,18 +515,31 @@ namespace BoxMan
             rotationAngle = (float)Math.Atan2(direction.Y, direction.X) + MathHelper.PiOver2;
 
             // Fire projectile with keyboard
-            if (keyboardState.IsKeyDown(Keys.Space) && previousKeyboardState.IsKeyUp(Keys.Space))
+            //if (keyboardState.IsKeyDown(Keys.Space) && previousKeyboardState.IsKeyUp(Keys.Space))
+            //{
+            //    Vector2 projectileDirection = mousePosition - PlayerPosition;
+            //    FireProjectile(projectileDirection);
+            //}
+
+            if (mouseState.LeftButton == ButtonState.Pressed && previousMouseState.LeftButton == ButtonState.Released)
             {
                 Vector2 projectileDirection = mousePosition - PlayerPosition;
                 FireProjectile(projectileDirection);
             }
+
+            if (mouseState.RightButton == ButtonState.Pressed && previousMouseState.RightButton == ButtonState.Released)
+            {
+                Vector2 projectileDirection = mousePosition - PlayerPosition;
+                FireProjectile(projectileDirection);
+            }
+
             previousMouseState = mouseState;
 
-            if (Keyboard.GetState().IsKeyDown(Keys.B) && !bombDropped)
-            {
-                playerBomb = new Bomb(PlayerPosition, bombTexture, bombDuration);
-                bombDropped = true;
-            }
+            //if (Keyboard.GetState().IsKeyDown(Keys.B) && !bombDropped)
+            //{
+            //    playerBomb = new Bomb(PlayerPosition, bombTexture, bombDuration);
+            //    bombDropped = true;
+            //}
 
             if (bombDropped)
             {
@@ -616,7 +629,7 @@ namespace BoxMan
                 _spriteBatch.DrawString(font, textToDisplay2, textPosition2, Color.White);
 
 
-                string GameTitleText = "=============\n       Bullet Box\n=============\n\n\n\n\n\n";
+                string GameTitleText = "=============\n       Bullet Box\n=============\n\n\n\n\n\n\n\n";
                 Vector2 textSize1 = font.MeasureString(GameTitleText);
                 Vector2 textPosition1 = new Vector2(
                     (_graphics.PreferredBackBufferWidth - textSize1.X) / 2, // Center horizontally
@@ -624,7 +637,7 @@ namespace BoxMan
                 );
                 _spriteBatch.DrawString(font, GameTitleText, textPosition1, Color.Green);
 
-                string gameOverText = "Press Enter or Start to Play\nPress Select or Esc to End";
+                string gameOverText = "Press Enter or Start to Play\nPress Select or Esc to End\nR1/Left Click to Fire\nL1/Right Click to Bomb\nMultiplayer to come...";
                 Vector2 textSize3 = font.MeasureString(gameOverText);
                 Vector2 textPosition3 = new Vector2(
                     (_graphics.PreferredBackBufferWidth - textSize3.X) / 2, // Center horizontally
